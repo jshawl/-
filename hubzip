@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+while [[ "$#" > 1 ]]; do case $1 in
+    --config) 
+      echo $2 > ~/.hubziprc
+    ;;
+    *);;
+  esac; shift
+done
+
+if [ ! -f ~/.hubziprc ]; then
+  echo "no hubzip config"
+  echo "$ hubzip --config user/repo"
+  exit
+fi
+
+
+
+dir=$1
+date=`date +"%s"`
+branch=${dir%/}-$date
+
+cd $dir
+unset GIT_DIR
+git init
+git remote add $date git@github.com:jshawl/-.git
+git checkout -b $branch
+git add --all :/
+git commit -m "hubzipped"
+git push $date $branch
+rm -rf .git
+echo "https://github.com/jshawl/-/archive/$branch.zip"
